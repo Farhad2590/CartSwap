@@ -6,7 +6,7 @@ import { GrLicense } from "react-icons/gr";
 import { TbLicense } from "react-icons/tb";
 import axios from "axios";
 import toast from "react-hot-toast";
-import useAuth from "../../hooks/UseAuth";
+import useAuth from "../../hooks/useAuth";
 
 const Profile = () => {
   const imgbbApi = "7f3a98e5b9235e50d10ab2af5590caa9";

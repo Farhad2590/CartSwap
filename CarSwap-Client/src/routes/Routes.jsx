@@ -9,6 +9,10 @@ import VerificatioRequest from "../Pages/Admin/VerificationRequest";
 import AllUsers from "../Pages/Admin/AllUsers";
 import AddCar from "../Pages/CarOwner/AddCar";
 import CarManagement from "../Pages/Admin/CarManagement/CarManagement";
+import BookingPage from "../Components/BookingComponents/BookingPage";
+import BookingConfirmation from "../Components/BookingComponents/BookingConfirmation";
+import DashboardOverview from "../Components/DashboardComponents/DashboardOverview";
+import BrowseCars from "../Components/DashboardComponents/BrowseCars";
 
 
 export const router = createBrowserRouter([
@@ -23,6 +27,9 @@ export const router = createBrowserRouter([
       },
       { path: "/signUpFlow", element: <SignUpFlow></SignUpFlow> },
       { path: "/signin", element: <Login></Login> },
+      {path: "/booking/:carId", element: <BookingPage/>},
+      {path: "/booking/:carId/confirmation", element: <BookingConfirmation/>}
+
     ],
   },
   {
@@ -30,8 +37,16 @@ export const router = createBrowserRouter([
     element: <Dashboard></Dashboard>,
     children: [
       {
+        path: "/dashboard",
+        element: <DashboardOverview />,
+      },
+      {
         path: "/dashboard/profile",
         element: <Profile />,
+      },
+       {
+        path: "/dashboard/browse-cars",
+        element: <BrowseCars />,
       },
       //Admin
       {
