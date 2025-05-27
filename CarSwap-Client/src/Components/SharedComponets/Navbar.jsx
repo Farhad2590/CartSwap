@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 // import UseAuth from '../hooks/UseAuth';
 import { Menu, X, Car, User, LogOut } from 'lucide-react';
-import UseAuth from '../../hooks/UseAuth';
+import UseAuth from '../../hooks/useAuth';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logOut } = UseAuth();
+  const { user, logOut } = UseAuth()
 
   const handleLogOut = () => {
     logOut()

@@ -12,9 +12,11 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@googlemaps/js-api-loader": "^1.16.8",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/styles": "^6.1.6",
+    "@react-google-maps/api": "^2.20.6",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.4.0",
     "@tanstack/react-query": "^5.62.8",

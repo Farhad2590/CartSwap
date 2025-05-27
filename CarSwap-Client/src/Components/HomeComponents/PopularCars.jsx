@@ -1,6 +1,6 @@
 import { Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -48,6 +48,16 @@ const PopularCars = () => {
       owner: "Mike Johnson",
     },
   ];
+
+   const navigate = useNavigate();
+
+  const handleBooking = (carId) => {
+    navigate(`/booking/${carId}`);
+  };
+
+  const generateSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
+
+
   return (
     <motion.section
       variants={containerVariants}
@@ -107,6 +117,7 @@ const PopularCars = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                     onClick={() => navigate(`/booking/${generateSlug(car.name)}`)}
                     className="bg-teal-500 text-white px-6 py-2 rounded-xl hover:bg-teal-600 transition-colors"
                   >
                     Book Now

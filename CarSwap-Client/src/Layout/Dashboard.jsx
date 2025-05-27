@@ -20,7 +20,7 @@ import { Menu, X } from "lucide-react";
 import useAdmin from "../hooks/useAdmin";
 import useOwner from "../hooks/useOwner";
 import useRenter from "../hooks/useRenter";
-import useAuth from "../hooks/UseAuth";
+import useAuth from "../hooks/useAuth";
 
 const Dashboard = () => {
   const { user, logOut } = useAuth();

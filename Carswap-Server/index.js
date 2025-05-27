@@ -8,6 +8,7 @@ const subscriptionRoutes = require("./routes/subscriptionRoutes");
 const verificationRoutes = require("./routes/verificationRoutes");
 // const adminRoutes = require('./routes/adminRoutes');
 const { connectToDatabase } = require("./config/db");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 const port = process.env.PORT || 9000;
@@ -29,6 +30,7 @@ app.use("/users", userRoutes);
 app.use("/cars", carRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/verifications", verificationRoutes);
+app.use("/booking", bookingRoutes)
 // app.use('/messages', messageRoutes);
 // app.use('/admin', adminRoutes);
 
