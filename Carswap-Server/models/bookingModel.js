@@ -8,7 +8,7 @@ class BookingModel {
 
   static async createBooking(bookingData) {
     const collection = await this.getCollection();
-    bookingData.status = 'confirmed'; // confirmed, cancelled, completed
+    bookingData.status = 'confirmed'; 
     bookingData.createdAt = new Date();
     const result = await collection.insertOne(bookingData);
     return { ...bookingData, _id: result.insertedId };

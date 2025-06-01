@@ -62,6 +62,15 @@ class UserModel {
       { upsert: true }
     );
   }
+
+  static async getPendingVerifications() {
+    const collection = await this.getCollection();
+    return collection
+      .find({
+        "verificationData.status": "pending",
+      })
+      .toArray();
+  }
 }
 
 module.exports = UserModel;

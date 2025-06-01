@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const userRoutes = require("./routes/userRoutes");
 const carRoutes = require("./routes/carRoutes");
-const subscriptionRoutes = require("./routes/subscriptionRoutes");
+const paymentRoutes = require("./routes/paymentRoute");
 const verificationRoutes = require("./routes/verificationRoutes");
 // const adminRoutes = require('./routes/adminRoutes');
 const { connectToDatabase } = require("./config/db");
@@ -28,9 +28,10 @@ connectToDatabase().catch(console.error);
 // Routes
 app.use("/users", userRoutes);
 app.use("/cars", carRoutes);
-app.use("/subscriptions", subscriptionRoutes);
+
 app.use("/verifications", verificationRoutes);
 app.use("/booking", bookingRoutes)
+app.use("/payments", paymentRoutes)
 // app.use('/messages', messageRoutes);
 // app.use('/admin', adminRoutes);
 

@@ -21,7 +21,7 @@ class SubscriptionModel {
     const collection = await this.getCollection();
     const userCollection = await connectToDatabase().then(db => db.collection('carSwapUser'));
     
-    // Add subscription to user
+
     await userCollection.updateOne(
       { _id: getObjectId(userId) },
       { $set: { subscription: subscriptionData } }

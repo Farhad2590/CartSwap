@@ -2,20 +2,20 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { User, Mail, Lock, Image, Car, Repeat } from "lucide-react";
+import { User, Mail, Lock, Image, Car, Repeat, Upload } from "lucide-react";
 import Lottie from "lottie-react";
 import animationData from "../assets/annimation/login.json";
 import UseAuth from "../hooks/useAuth";
 import axios from "axios";
-
-
 
 const Signup = ({ userType }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/";
   const { createUser, updateUserProfile } = UseAuth();
-  // const [isSubscribed, setIsSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState(null);
+  const imgbbApi = "7f3a98e5b9235e50d10ab2af5590caa9";
 
   const {
     register,
@@ -24,43 +24,63 @@ const Signup = ({ userType }) => {
     formState: { errors },
   } = useForm();
 
+  const handlePhotoChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhotoFile(e.target.files[0]);
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
-
+      setLoading(true);
       const lowerCaseEmail = data.email.toLowerCase();
       
-      const result = await createUser(lowerCaseEmail, data.password);
-      await updateUserProfile(data.name, data.photoURL);
+      // Upload photo if file was selected
+      let photoUrl = "https://i.ibb.co/ScLz5b5/pic1.jpg"; // Default image
       
+      if (photoFile) {
+        const formDataImg = new FormData();
+        formDataImg.append("image", photoFile);
+
+        const response = await fetch(
+          `https://api.imgbb.com/1/upload?key=${imgbbApi}`,
+          { method: "POST", body: formDataImg }
+        );
+        
+        const result = await response.json();
+        if (result.success) {
+          photoUrl = result.data.url;
+        } else {
+          throw new Error("Image upload failed");
+        }
+      }
+
+      // Create user in Firebase
+      const result = await createUser(lowerCaseEmail, data.password);
+      await updateUserProfile(data.name, photoUrl);
+      
+      // Prepare user data for backend
       const userData = {
         email: lowerCaseEmail,
         name: data.name,
         phone: data.phone,
-        photo: data.photoURL || "https://i.ibb.co/ScLz5b5/pic1.jpg",
+        photo: photoUrl,
         userType: userType,
-        // isSubscribed: isSubscribed,
-        verificationStatus:  "unverified",
+        verificationStatus: "unverified",
         createdAt: new Date().toISOString(),
       };
 
-   
-      console.log("User created:", userData);
-
-      try {
-        await axios.post("http://localhost:9000/users", userData);
-        navigate(from, { replace: true });
-      } catch (apiError) {
-        console.error("API Error:", apiError.response?.data || apiError.message);
-      }
+      // Save user to database
+      await axios.post("http://localhost:9000/users", userData);
       
       reset();
-      toast.success(
-        `Account created successfully!`
-      );
+      toast.success(`Account created successfully!`);
       navigate(from, { replace: true });
     } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error("Error creating account. Please try again.");
+      console.error("Error:", error);
+      toast.error(error.message || "Error creating account. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -164,16 +184,43 @@ const Signup = ({ userType }) => {
                 )}
               </div>
 
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Image className="h-5 w-5 text-teal-500" />
+              {/* Profile Photo Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Profile Photo
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                    id="profile-photo"
+                  />
+                  <label
+                    htmlFor="profile-photo"
+                    className="cursor-pointer flex flex-col items-center justify-center"
+                  >
+                    <Upload className="h-8 w-8 text-teal-500 mb-2" />
+                    <span className="text-sm font-medium text-teal-600">
+                      {photoFile ? "Photo selected" : "Click to upload photo"}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">
+                      {photoFile ? photoFile.name : "JPG, PNG up to 5MB"}
+                    </span>
+                  </label>
                 </div>
-                <input
-                  type="url"
-                  {...register("photoURL")}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-gray-50 transition-all"
-                  placeholder="Profile Photo URL (optional)"
-                />
+                {photoFile && (
+                  <div className="flex justify-center mt-2">
+                    <div className="w-16 h-16 relative overflow-hidden rounded-full border border-teal-200">
+                      <img
+                        src={URL.createObjectURL(photoFile)}
+                        alt="Profile preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -204,7 +251,6 @@ const Signup = ({ userType }) => {
               </div>
             )}
 
-
             {/* Terms Checkbox */}
             <div className="flex items-center mt-4">
               <input
@@ -227,9 +273,20 @@ const Signup = ({ userType }) => {
             {/* Submit Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full mt-6 flex items-center justify-center px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-700 text-white rounded-xl hover:from-teal-600 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transform transition-all hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Create {getRoleTitle()} Account
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Account...
+                </>
+              ) : (
+                `Create ${getRoleTitle()} Account`
+              )}
             </button>
           </form>
 
