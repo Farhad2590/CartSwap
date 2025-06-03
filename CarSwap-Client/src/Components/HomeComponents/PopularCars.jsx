@@ -1,6 +1,8 @@
 import { Star, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -19,35 +21,36 @@ const itemVariants = {
   },
 };
 const PopularCars = () => {
-  const popularCars = [
-    {
-      id: 1,
-      name: "Tesla Model 3",
-      image: "/api/placeholder/400/300",
-      price: "75",
-      rating: 4.9,
-      location: "New York",
-      owner: "John Doe",
-    },
-    {
-      id: 2,
-      name: "BMW 3 Series",
-      image: "/api/placeholder/400/300",
-      price: "65",
-      rating: 4.8,
-      location: "Los Angeles",
-      owner: "Jane Smith",
-    },
-    {
-      id: 3,
-      name: "Toyota Camry",
-      image: "/api/placeholder/400/300",
-      price: "45",
-      rating: 4.7,
-      location: "Chicago",
-      owner: "Mike Johnson",
-    },
-  ];
+  // const popularCars = [
+  //   {
+  //     id: 1,
+  //     name: "Tesla Model 3",
+  //     image: "/api/placeholder/400/300",
+  //     price: "75",
+  //     rating: 4.9,
+  //     location: "New York",
+  //     owner: "John Doe",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "BMW 3 Series",
+  //     image: "/api/placeholder/400/300",
+  //     price: "65",
+  //     rating: 4.8,
+  //     location: "Los Angeles",
+  //     owner: "Jane Smith",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Toyota Camry",
+  //     image: "/api/placeholder/400/300",
+  //     price: "45",
+  //     rating: 4.7,
+  //     location: "Chicago",
+  //     owner: "Mike Johnson",
+  //   },
+  // ];
+  const [popularCars, setPopularCars] = useState([])
 
    const navigate = useNavigate();
 
@@ -56,6 +59,20 @@ const PopularCars = () => {
   };
 
   const generateSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
+
+  const fetchFeaturedRides = async() => {
+    try {
+      const response = await axios.get("http://localhost:9000/cars")
+      console.log(response.data)
+      setPopularCars(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchFeaturedRides();
+  },[])
 
 
   return (
@@ -85,15 +102,15 @@ const PopularCars = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {popularCars.map((car, index) => (
             <motion.div
-              key={car.id}
+              key={car._id}
               variants={itemVariants}
               whileHover={{ y: -10 }}
               className="bg-white rounded-2xl shadow-lg overflow-hidden group"
             >
               <div className="relative overflow-hidden">
                 <img
-                  src={car.image}
-                  alt={car.name}
+                  src={Array.isArray(car?.vehicle_images) && car.vehicle_images.length > 0 ? car.vehicle_images[0] : "/default-image.jpg"}
+                  alt={car.vehicle_brand}
                   className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -101,23 +118,23 @@ const PopularCars = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-semibold">{car.name}</h3>
-                    <p className="text-gray-500">{car.location}</p>
+                    <h3 className="text-xl font-semibold">{car.vehicle_brand}{" "}{car.vehicle_engine_number}</h3>
+                    <p className="text-gray-500">{car?.posting_location}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="text-gray-600">{car.rating}</span>
+                    <span className="text-gray-600">{car?.rating}</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="text-2xl font-bold text-teal-500">
-                    ${car.price}
+                    ${car.vehicle_rate_per_hour}
                     <span className="text-sm text-gray-500">/day</span>
                   </p>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                     onClick={() => navigate(`/booking/${generateSlug(car.name)}`)}
+                     onClick={() => navigate(`/booking/${car._id}`)}
                     className="bg-teal-500 text-white px-6 py-2 rounded-xl hover:bg-teal-600 transition-colors"
                   >
                     Book Now

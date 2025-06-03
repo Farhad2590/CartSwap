@@ -13,6 +13,7 @@ import BookingPage from "../Components/BookingComponents/BookingPage";
 import BookingConfirmation from "../Components/BookingComponents/BookingConfirmation";
 import DashboardOverview from "../Components/DashboardComponents/DashboardOverview";
 import BrowseCars from "../Components/DashboardComponents/BrowseCars";
+import TransactionHistory from "../Components/DashboardComponents/Transactions";
 
 
 export const router = createBrowserRouter([
@@ -27,7 +28,7 @@ export const router = createBrowserRouter([
       },
       { path: "/signUpFlow", element: <SignUpFlow></SignUpFlow> },
       { path: "/signin", element: <Login></Login> },
-      {path: "/booking/:carId", element: <BookingPage/>},
+      {path: "/booking/:id", element: <BookingPage/>},
       {path: "/booking/:carId/confirmation", element: <BookingConfirmation/>}
 
     ],
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/manage-cars",
         element: <CarManagement />,
+      },
+       {
+        path: "/dashboard/transactions",
+        element: <TransactionHistory />,
       },
 
       //CarOwner

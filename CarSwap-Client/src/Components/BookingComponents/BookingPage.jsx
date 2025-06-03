@@ -519,6 +519,7 @@ import { MapPin, Star } from "lucide-react";
 import { useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { GoogleMap, LoadScript, Autocomplete, DirectionsRenderer } from "@react-google-maps/api";
+import axios from "axios";
 
 const center = { lat: 23.8103, lng: 90.4125 }; 
 
@@ -528,32 +529,32 @@ const containerStyle = {
 };
 
 // Mock car data
-const carsData = {
-  "tesla-model-3": {
-    name: "Tesla Model 3",
-    image: "https://via.placeholder.com/600x300?text=Tesla+Model+3",
-    price: 75,
-    rating: 4.9,
-    location: "New York",
-  },
-  "bmw-3-series": {
-    name: "BMW 3 Series",
-    image: "https://via.placeholder.com/600x300?text=BMW+3+Series",
-    price: 65,
-    rating: 4.8,
-    location: "Los Angeles",
-  },
-  "toyota-camry": {
-    name: "Toyota Camry",
-    image: "https://via.placeholder.com/600x300?text=Toyota+Camry",
-    price: 45,
-    rating: 4.7,
-    location: "Chicago",
-  },
-};
+// const carsData = {
+//   "tesla-model-3": {
+//     name: "Tesla Model 3",
+//     image: "https://via.placeholder.com/600x300?text=Tesla+Model+3",
+//     price: 75,
+//     rating: 4.9,
+//     location: "New York",
+//   },
+//   "bmw-3-series": {
+//     name: "BMW 3 Series",
+//     image: "https://via.placeholder.com/600x300?text=BMW+3+Series",
+//     price: 65,
+//     rating: 4.8,
+//     location: "Los Angeles",
+//   },
+//   "toyota-camry": {
+//     name: "Toyota Camry",
+//     image: "https://via.placeholder.com/600x300?text=Toyota+Camry",
+//     price: 45,
+//     rating: 4.7,
+//     location: "Chicago",
+//   },
+// };
 
 export default function BookingPage() {
-  const { carId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -567,9 +568,11 @@ export default function BookingPage() {
   const [pickup, setPickup] = useState(null);
   const [dropoff, setDropoff] = useState(null);
   const [directions, setDirections] = useState(null);
+  const [carsData, setCarsData] = useState();
 
   const pickupRef = useRef();
   const dropoffRef = useRef();
+
 
   const calculateRoute = () => {
     if (!pickup || !dropoff) return;
@@ -592,9 +595,9 @@ export default function BookingPage() {
     );
   };
 
-  const car = carsData[carId];
+  // const car = carsData[carId];
 
-  if (!car) {
+  if (!carsData) {
     return <div className="p-6 text-red-500">Car not found</div>;
   }
 
@@ -659,8 +662,28 @@ export default function BookingPage() {
     // });
     
     // Navigate to confirmation page
-    navigate(`/booking/${carId}/confirmation`);
+    navigate(`/booking/${id}/confirmation`);
   };
+
+
+
+   const fetchCarData = async() => {
+    try {
+      const response = await axios.get(`http://localhost:9000/cars/${id}`)
+      console.log("get one car", response)
+      setCarsData(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if(id){
+          fetchCarData();
+    }
+  },[id])
+
+  console.log("carid", id)
 
   return (
     <div className="container mx-auto px-4 py-8">

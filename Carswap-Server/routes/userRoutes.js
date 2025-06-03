@@ -9,7 +9,7 @@ router.put("/:email", userController.updateUserByEmail);
 router.post("/", userController.createUser);
 router.delete("/:id", userController.deleteUser);
 router.put("/updateUserRole/:email", userController.updateUserByEmail);
-
+router.get('/stats', userController.getUserStats); // Call with ?email=admin@example.com
 // Role checking routes
 router.get("/admin/:email", userController.checkAdminStatus);
 router.get("/owner/:email", userController.checkOwnerStatus);

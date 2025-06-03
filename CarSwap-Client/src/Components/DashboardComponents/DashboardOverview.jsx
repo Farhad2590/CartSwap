@@ -13,8 +13,65 @@ import {
   CalendarDays,
   BarChart3,
 } from "lucide-react"
+import { useState } from 'react';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 function DashboardOverview() {
+const [userStats, setuserStates] = useState({
+    rental: 0,
+    owner: 0,
+    verified: 0,
+  });
+const fetchUserStats = async() => {
+  try {
+    const res = await axios.get("http://localhost:9000/users");
+    console.log("stas", res);
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+
+ useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:9000/users');
+        const data = response.data;
+        console.log(data)
+
+        let rentalTotal = 0;
+        let ownerTotal = 0;
+        let verifiedTotal = 0;
+
+      data.forEach(user => {
+          if (user.userType === 'renter') {
+            rentalTotal += 1;
+          }
+          if (user.userType === 'owner') {
+            ownerTotal += 1;
+          }
+          if (user.verificationStatus === 'Verified') {
+            verifiedTotal += 1;
+          }
+        });
+
+        setuserStates({
+          rental: rentalTotal,
+          owner: ownerTotal,
+          verified: verifiedTotal,
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log("states", userStats);
     return (
          <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm">
@@ -44,22 +101,22 @@ function DashboardOverview() {
             <StatCard
               icon={<Car className="text-teal-500" size={24} />}
               title="Active Rentals"
-              value="2"
+              value={userStats.rental}
               change="+1 from last month"
               changeType="positive"
             />
             <StatCard
               icon={<Calendar className="text-purple-500" size={24} />}
-              title="Upcoming Bookings"
-              value="3"
+              title="Active Owners"
+              value={userStats.owner}
               change="+2 from last month"
               changeType="positive"
             />
             <StatCard
               icon={<CreditCard className="text-blue-500" size={24} />}
-              title="Total Spent"
-              value="$1,240"
-              change="+$340 from last month"
+              title="Verified User"
+              value={userStats.verified}
+              change="+1 from last month"
               changeType="positive"
             />
             <StatCard

@@ -109,6 +109,79 @@ const userController = {
       res.status(500).send({ error: error.message });
     }
   },
+
+  // Add this method to your userController object
+
+// getUserStats: async (req, res) => {
+//   try {
+//     const result = await UserModel.getUserStats();
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         totalRenters: result.totalRenters || 0,
+//         totalOwners: result.totalOwners || 0,
+//         verifiedHolders: result.verifiedHolders || 0
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error fetching user statistics:", error);
+//     res.status(500).json({ 
+//       success: false,
+//       error: "Internal Server Error",
+//       message: error.message 
+//     });
+//   }
+// },
+
+// Add this method to your userController object
+
+getUserStats: async (req, res) => {
+  try {
+    // Get email from request (could be from params, query, or body)
+    const email = req.params.email || req.query.email || req.body.email;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
+    }
+    
+    // Check if user exists and is admin
+    const user = await UserModel.getUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+    
+    if (user.userType !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin privileges required."
+      });
+    }
+    
+    // User is admin, get stats
+    const result = await UserModel.getUserStats();
+    res.status(200).json({
+      success: true,
+      data: {
+        totalRenters: result.totalRenters || 0,
+        totalOwners: result.totalOwners || 0,
+        verifiedHolders: result.verifiedHolders || 0
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching user statistics:", error);
+    res.status(500).json({ 
+      success: false,
+      error: "Internal Server Error",
+      message: error.message 
+    });
+  }
+},
 };
 
 module.exports = userController;

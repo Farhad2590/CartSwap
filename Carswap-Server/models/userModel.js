@@ -62,6 +62,58 @@ class UserModel {
       { upsert: true }
     );
   }
+
+
+static async getUserStats() {
+  try {
+    const collection = await this.getCollection();
+    
+    const stats = await collection.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRenters: {
+            $sum: {
+              $cond: [
+                { $eq: ["$userType", "renter"] },
+                1,
+                0
+              ]
+            }
+          },
+          totalOwners: {
+            $sum: {
+              $cond: [
+                { $eq: ["$userType", "owner"] },
+                1,
+                0
+              ]
+            }
+          },
+          verifiedHolders: {
+            $sum: {
+              $cond: [
+                { $eq: ["$verificationStatus", "verified"] },
+                1,
+                0
+              ]
+            }
+          }
+        }
+      }
+    ]).toArray();
+    
+    return stats.length > 0 ? stats[0] : {
+      totalRenters: 0,
+      totalOwners: 0,
+      verifiedHolders: 0
+    };
+  } catch (error) {
+    console.error("Error in getUserStats model:", error);
+    throw error;
+  }
+}
+  
 }
 
 module.exports = UserModel;
